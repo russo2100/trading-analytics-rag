@@ -1,0 +1,14 @@
+Почему так:
+Storage Layer — фундамент для retrieval. 
+FAISS хранит embeddings, 
+SQLite — structured metadata (source, timestamp, authority), 
+cache ускоряет повторные запросы.
+
+Критерий готовности
+✅ vector_store.py: FAISS wrapper (add, search, save/load index)
+
+✅ metadata_store.py: SQLite wrapper (insert, query, filters)
+
+✅ cache.py: In-memory cache (для MVP, Redis позже)
+
+✅ schema.sql: Таблицы SQLite (events, metadata)

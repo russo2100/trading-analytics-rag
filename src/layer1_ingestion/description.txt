@@ -1,0 +1,16 @@
+Почему так
+Ingestion Layer — точка входа всех данных в систему. 
+Получает сырые данные из разнородных источников (JSONL логи, EIA API, погода, новости), 
+нормализует в единый формат (Pydantic models), 
+валидирует, дедуплицирует и готовит для хранения. 
+Это гарантирует, что в Storage Layer попадают только валидные, 
+уникальные события с правильными метаданными (authority, freshness, canonical form).
+
+Критерий готовности
+✅ models.py: Pydantic models (IngestMessage, IngestedEvent, EIAStorageData, WeatherForecast, NewsItem) — контракты данных
+
+✅ loaders.py: Загрузчики сырых данных (JSONL reader, EIA API fetcher, Weather API, RSS parser) — получение данных
+
+✅ normalizers.py: Преобразователи в canonical form (bot logs → IngestedEvent, EIA → normalized data) — унификация форматов
+
+✅ deduplication.py: Логика дедупликации по event_id, разрешение конфликтов (keep_latest, keep_highest_authority) — защита от дубликатов

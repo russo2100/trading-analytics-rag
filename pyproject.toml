@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "dag-ng-trading"
+version = "0.1.0"
+description = "Decision-Augmented Generation system for NG futures trading"
+authors = ["Руслан <russo2100@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^2.9.2"
+pydantic-settings = "^2.6.1"
+python-dotenv = "^1.0.1"
+pandas = "^2.2.3"
+numpy = "^1.26.4"
+faiss-cpu = "^1.9.0"
+sentence-transformers = "^3.3.1"
+sqlalchemy = "^2.0.36"
+httpx = "^0.28.1"
+feedparser = "^6.0.11"
+openai = "^1.58.1"
+pytz = "^2024.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-asyncio = "^0.25.2"
+pytest-cov = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
