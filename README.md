@@ -1,168 +1,356 @@
-# DAG System для NG Фьючерсов (EventHorizon Trading AI)
+# 🚀 Trading Analytics RAG System
 
-**Decision-Augmented Generation (DAG) система** для генерации торговых сигналов по фьючерсам Natural Gas (NG), торгуемым через Т-Инвестиции.
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-Phase%201%20Complete-success.svg)]()
 
----
-
-## 🎯 Цель проекта
-
-Производственная RAG/DAG система, которая:
-- Анализирует фундаментальные данные (EIA storage, погода, новости)
-- Генерирует торговые сигналы (BUY/SELL/HOLD + лоты + confidence + reasoning)
-- Работает как portfolio-проект уровня Middle+ ML Engineer
-
-**Ключевое отличие от generic RAG:**
-- Не просто поиск по документам, а **принятие торговых решений**
-- Детерминированные правила (Stage 1) + LLM explanation (Stage 2)
-- Confidence score — агрегация доказательств, НЕ угадывание LLM
+Production-grade **RAG (Retrieval-Augmented Generation)** system for natural gas trading analytics. Portfolio project demonstrating LLMOps best practices: multi-source data ingestion, hybrid retrieval, evaluation-driven development, and agentic workflows.
 
 ---
 
-## 🏗️ Архитектура (7-слойная DAG)
+## 🎯 Project Goals
 
-Layer 1: Ingestion & Normalization
-Layer 2: Storage & Indexing (FAISS + SQLite)
-Layer 3: Hybrid Retrieval (Vector + Keyword + RRF)
-Layer 4: Context Scoring (Relevance + Freshness + Authority)
-Layer 5: Decision Logic (Deterministic Rules + LLM Reasoning)
-Layer 6: Confidence Scoring (Evidence Aggregation)
-Layer 7: Output & Governance (Validation + Audit)
-
-text
-
-См. полную схему в `docs/architecture.md`
+| Goal | Description |
+|------|-------------|
+| **Multi-source KB** | Ingest trading bot logs (JSONL), market reports (PDF), news articles (TXT/MD) |
+| **Hybrid Retrieval** | BM25 + dense embeddings + reranking for high precision/recall |
+| **Production-ready** | FastAPI service, Docker Compose, monitoring, security (anti-injection) |
+| **Measurable Quality** | Gold Q/A dataset, automated evaluation (Ragas-like metrics) |
+| **Portfolio Value** | Clean code, reproducible setup, documented design decisions |
 
 ---
 
-## 🚀 Quickstart
+## 📊 Current Status
 
-### 1. Установка
+### Phase 1: Foundation ✅
+
+| Component | Status | Details |
+|-----------|:------:|---------|
+| **Data Schema** | ✅ | SQLite: `trading_events`, `sessions`, `trades`, `broker_trades` |
+| **Ingestion Pipeline** | ✅ | Multi-format support (JSONL v1/v2, PDF, TXT) |
+| **Data Quality** | ✅ | 1,041 events, 26 trades, 0 NULL/duplicates |
+| **Deduplication** | ✅ | Deterministic event IDs, integrity checks |
+
+### Phase 2: Retrieval 🚧
+
+| Component | Status | Details |
+|-----------|:------:|---------|
+| **Vector Store** | 🚧 | Weaviate/FAISS integration |
+| **Hybrid Search** | ⏳ | BM25 + dense retrieval |
+| **Reranking** | ⏳ | Cross-encoder for top-K refinement |
+| **Evaluation** | ⏳ | Gold Q/A dataset + metrics |
+
+### Phases 3-5: Planned
+
+- **Phase 3**: Generation (LLM integration, prompt engineering, citation tracking)
+- **Phase 4**: Agents (task planning, multi-step reasoning, tool calling)
+- **Phase 5**: Production (FastAPI, Docker, monitoring, CI/CD)
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         USER QUERY                              │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 5: AGENTS                                                │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  • Task Decomposition  • Multi-step Reasoning            │   │
+│  │  • Tool Calling (SQL, calculations, external APIs)       │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 4: GENERATION                                            │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  • LLM Integration (OpenRouter, local models)            │   │
+│  │  • Prompt Engineering  • Citation Tracking               │   │
+│  │  • Anti-injection Guards  • Context Compression          │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 3: RETRIEVAL                                             │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Hybrid Search                                           │   │
+│  │  ├─ BM25 (keyword)      ┐                                │   │
+│  │  ├─ Dense (embeddings)  ├─ Reranking ─> Top-K Results   │   │
+│  │  └─ Query Expansion     ┘                                │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 2: STORAGE                                               │
+│  ┌────────────────────┐      ┌─────────────────────────────┐   │
+│  │  SQLite (FTS5)     │      │  Vector DB (Weaviate/FAISS) │   │
+│  │  • Metadata        │      │  • Embeddings               │   │
+│  │  • Full-text index │      │  • Dense retrieval          │   │
+│  └────────────────────┘      └─────────────────────────────┘   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 1: INGESTION                                             │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Multi-format Loaders                                    │   │
+│  │  ├─ JSONL (bot logs v1/v2)                               │   │
+│  │  ├─ PDF (broker reports, EIA docs)                       │   │
+│  │  ├─ TXT/MD (news articles)                               │   │
+│  │  └─ CSV (trade history)                                  │   │
+│  │                                                           │   │
+│  │  Normalization → Deduplication → Validation              │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                             ▲
+                             │
+                    ┌────────┴────────┐
+                    │  DATA SOURCES   │
+                    └─────────────────┘
+```
+
+---
+
+## 📁 Project Structure
+
+```
+trading-analytics-rag/
+│
+├── 📂 src/                           # Source code (layered architecture)
+│   ├── layer1_ingestion/            # Data loaders, normalizers, validators
+│   │   ├── loaders.py              # JSONL, PDF, TXT parsers
+│   │   ├── normalizers.py          # v1/v2 format normalization
+│   │   ├── deduplication.py        # Event deduplication logic
+│   │   └── models.py               # Pydantic data models
+│   │
+│   ├── layer2_storage/              # Database clients
+│   │   ├── metadata_store.py       # SQLite client (FTS5)
+│   │   ├── vector_store.py         # Weaviate/FAISS wrapper
+│   │   └── schema.sql              # Database schema (trading + RAG tables)
+│   │
+│   ├── layer3_retrieval/            # Search & ranking
+│   │   ├── query_router.py         # Route queries to appropriate index
+│   │   ├── hybrid_search.py        # BM25 + dense fusion
+│   │   └── reranker.py             # Cross-encoder reranking
+│   │
+│   ├── layer4_generation/           # LLM integration
+│   │   ├── answer_generator.py     # LLM wrapper (OpenRouter, local)
+│   │   ├── prompt_templates.py     # Prompt engineering
+│   │   └── citation_tracker.py     # Source attribution
+│   │
+│   ├── layer5_agents/               # Agentic workflows
+│   │   ├── task_planner.py         # Multi-step reasoning
+│   │   └── tools.py                # SQL executor, calculators
+│   │
+│   └── config.py                    # Global configuration
+│
+├── 📂 scripts/                       # CLI tools
+│   ├── init_database.py            # Initialize DB schema
+│   ├── ingest_trading_logs.py      # Import trading bot logs
+│   ├── check_database.py           # Data quality checks
+│   └── run_eval.py                 # Evaluation pipeline
+│
+├── 📂 data/                          # Data files (gitignored)
+│   ├── raw/                        # Source files (JSONL, PDF, TXT)
+│   ├── eval/                       # Gold Q/A dataset
+│   ├── vector_index/               # Vector DB index
+│   └── metadata.db                 # SQLite database
+│
+├── 📂 docs/                          # Documentation
+│   ├── architecture.md             # Design decisions
+│   ├── eval_baseline.md            # Baseline metrics
+│   └── roadmap.md                  # Development roadmap
+│
+├── 📂 tests/                         # Tests
+│   ├── unit/                       # Unit tests
+│   ├── integration/                # Integration tests
+│   └── fixtures/                   # Test data
+│
+├── .env.example                     # Environment template
+├── .gitignore                       # Git ignore rules
+├── requirements.txt                 # Python dependencies
+├── docker-compose.yml               # Local dev stack
+├── LICENSE                          # MIT License
+└── README.md                        # This file
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Python**: 3.11 or higher
+- **SQLite**: 3.35+ (for FTS5 support)
+- **Docker** (optional): For Weaviate vector database
+
+### Installation
 
 ```bash
-# Клонировать (или скопировать папку)
-cd lesson_3
+# 1. Clone repository
+git clone https://github.com/russo2100/trading-analytics-rag.git
+cd trading-analytics-rag
 
-# Создать виртуальное окружение
+# 2. Create virtual environment
 python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/Mac
 
-# Установить зависимости
+# Windows
+venv\Scripts\activate
+
+# Linux/Mac
+source venv/bin/activate
+
+# 3. Install dependencies
 pip install -r requirements.txt
-2. Настройка
-bash
-# Скопировать шаблон .env
-copy .env.example .env  # Windows
-# cp .env.example .env  # Linux/Mac
 
-# Отредактировать .env (добавить API ключи)
-notepad .env  # Windows
-# nano .env  # Linux/Mac
-Обязательные ключи:
+# 4. Set up environment
+cp .env.example .env
+# Edit .env: add API keys (OpenRouter, etc.)
+```
 
-OPENROUTER_API_KEY — для LLM (Claude 3.5 Sonnet)
+### Initialize Database
 
-EIA_API_KEY — для данных по storage/production
+```bash
+# Create tables from schema.sql
+python scripts/init_database.py
 
-3. Запуск (Week 1 — Ingestion)
-bash
-# Загрузить данные из логов бота
-python scripts/ingest_logs.py --source data/raw/logs.jsonl
+# Import sample trading logs (if available)
+python scripts/ingest_trading_logs.py --source data/raw/logs.jsonl
 
-# Построить векторный индекс
-python scripts/build_index.py
-📁 Структура проекта
-text
-lesson_3/
-├── src/
-│   ├── layer1_ingestion/   # JSONL, EIA API, нормализация
-│   ├── layer2_storage/     # FAISS + SQLite
-│   ├── layer3_retrieval/   # Hybrid search (Week 2)
-│   ├── layer4_scoring/     # Context scoring (Week 2)
-│   ├── layer5_decision/    # Rules + LLM (Week 3)
-│   ├── layer6_confidence/  # Evidence aggregation (Week 3)
-│   └── layer7_validation/  # Governance (Week 4)
-├── tests/                  # Unit + Integration тесты
-├── data/
-│   ├── raw/                # JSONL логи от бота
-│   ├── processed/          # Ingested events
-│   └── vector_index/       # FAISS индекс
-├── scripts/                # CLI утилиты
-└── docs/                   # Документация
+# Verify data quality
+python scripts/check_database.py
+```
 
-🧪 Тестирование
-bash
-# Запустить все тесты
-pytest tests/
+**Expected output:**
+```
+📊 Database: data/metadata.db
+📋 Tables (12):
+   • trading_events: 1,041 rows
+   • sessions: 2 rows
+   • trades: 26 rows
+   
+⚠️  Data quality checks:
+   • NULL actions: 0
+   • Duplicate event_ids: 0
+   • Orphaned trades: 0
+```
 
-# Только unit-тесты ingestion
-pytest tests/test_ingestion.py -v
+---
 
-# С покрытием
-pytest --cov=src tests/
-📊 Roadmap
- Week 0: Методологический анализ (TRD → DAG architecture)
+## 📈 Data Schema
 
- Week 1: Layer 1 (Ingestion) + Layer 2 (Storage)
+### Core Tables
 
- Week 2: Layer 3 (Retrieval) + Layer 4 (Scoring)
+#### `trading_events` — Bot decision log
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_id` | TEXT PK | Deterministic ID (YYYYMMDD_cycle_unix) |
+| `session_id` | TEXT | Daily session (YYYYMMDD) |
+| `timestamp` | TEXT | ISO 8601 timestamp |
+| `cycle` | INTEGER | Iteration number within session |
+| `price` | REAL | Market price (USD) |
+| `rsi` | REAL | RSI indicator |
+| `lots` | INTEGER | Position size |
+| `pnl_pct` | REAL | Current P&L (%) |
+| `action` | TEXT | Decision (BUY/SELL/NOOP) |
+| `reason` | TEXT | Decision rationale |
+| `ai_signal` | TEXT | AI recommendation |
+| `ai_confidence` | INTEGER | Confidence score (0-100) |
 
- Week 3: Layer 5 (Decision) + Layer 6 (Confidence)
+#### `sessions` — Daily aggregates
+| Field | Type | Description |
+|-------|------|-------------|
+| `session_id` | TEXT PK | Date (YYYYMMDD) |
+| `date` | TEXT | ISO date |
+| `total_cycles` | INTEGER | Total iterations |
+| `total_trades` | INTEGER | Count of non-NOOP actions |
+| `final_lots` | INTEGER | End-of-day position |
+| `final_pnl_pct` | REAL | Final P&L (%) |
 
- Week 4: Layer 7 (Validation) + Integration с ботом
+#### `trades` — Executed actions only
+| Field | Type | Description |
+|-------|------|-------------|
+| `trade_id` | TEXT PK | Same as event_id |
+| `event_id` | TEXT FK | Link to trading_events |
+| `action` | TEXT | BUY/SELL |
+| `lots_changed` | INTEGER | Net change (+/-) |
+| `price_usd` | REAL | Execution price |
 
-📖 Документация
-Архитектура — полная диаграмма 7 слоёв
+---
 
-Торговые правила — детерминированные правила (твоя зона)
+## 🧪 Testing
 
-Evaluation plan — synthetic scenarios + baseline
+```bash
+# Run all tests
+pytest
 
-🛡️ Security
-⚠️ НИКОГДА не коммитьте .env файл!
+# Run with coverage report
+pytest --cov=src --cov-report=html tests/
 
-Все API ключи должны быть в .env (ignored by git). Используй .env.example как шаблон.
+# Run specific test suite
+pytest tests/unit/test_normalizers.py -v
 
-📝 License
-Proprietary (Portfolio project)
+# Run integration tests only
+pytest tests/integration/ -v
+```
 
-👤 Author
-Руслан (russo2100) — ML/AI Engineer, EventHorizon Trading AI
+---
 
-text
+## 🛡️ Security & Best Practices
 
-***
+### Implemented
 
-## **Файл 3: `requirements.txt`**
+✅ **Prompt injection protection**: All retrieved context treated as untrusted data  
+✅ **Secrets management**: `.env` file (gitignored), no hardcoded API keys  
+✅ **Input validation**: Pydantic models for all external inputs  
+✅ **Deterministic IDs**: Event IDs prevent duplicates and enable idempotent ingestion  
 
-```txt
-# Core
-pydantic==2.9.2
-pydantic-settings==2.6.1
-python-dotenv==1.0.1
+### Planned
 
-# Data processing
-pandas==2.2.3
-numpy==1.26.4
+⏳ **Rate limiting**: API request throttling  
+⏳ **PII detection**: Automatic redaction of sensitive data  
+⏳ **Audit logging**: All queries and retrieval results logged  
 
-# Vector store
-faiss-cpu==1.9.0
-sentence-transformers==3.3.1
+---
 
-# Metadata store
-sqlalchemy==2.0.36
+## 📚 Documentation
 
-# API clients
-httpx==0.28.1
-feedparser==6.0.11  # для EIA RSS
+- **[Architecture & Design Decisions](docs/architecture.md)** — System design rationale
+- **[RAG/KAG Roadmap](docs/roadmap.md)** — 12-month development plan
+- **[Evaluation Methodology](docs/eval_baseline.md)** — Metrics and baselines
 
-# LLM (через OpenRouter)
-openai==1.58.1  # OpenRouter совместим с OpenAI SDK
+---
 
-# Testing
-pytest==8.3.4
-pytest-asyncio==0.25.2
-pytest-cov==6.0.0
+## 📝 License
 
-# Utilities
-pytz==2024.2
+MIT License — see [LICENSE](LICENSE) file for details.
+
+---
+
+## 👤 Author
+
+**Руслан Латыпов**  
+AI/ML Engineer | RAG/KAG Systems | LangChain/LlamaIndex  
+
+[![GitHub](https://img.shields.io/badge/GitHub-russo2100-181717?logo=github)](https://github.com/russo2100)
+[![Portfolio](https://img.shields.io/badge/Portfolio-View-blue)](https://github.com/russo2100/trading-analytics-rag)
+
+---
+
+## 📌 Project Status
+
+**Phase 1 (Foundation)**: ✅ Complete  
+**Phase 2 (Retrieval)**: 🚧 In Progress  
+**Last Updated**: February 1, 2026
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ for production AI systems</sub>
+</div>
