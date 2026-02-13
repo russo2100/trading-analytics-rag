@@ -55,7 +55,7 @@ Action: Запустить build_vector_index.py
 ```
 Layer 1 (Ingestion):  ✅ 100%
 Layer 2 (Storage):    ✅ 100%
-Layer 3 (Retrieval):  🚧 30%
+Layer 3 (Retrieval):  ✅ 100%
 Layer 4 (Generation): ⏳ 0%
 Layer 5 (Agents):     ⏳ 0%
 ```
@@ -99,7 +99,10 @@ Layer 5: Agents (планируется)
     ↓
 Layer 4: Generation (планируется)
     ↓
-Layer 3: Retrieval (в процессе)
+Layer 3: Retrieval ✅
+    ├─ Hybrid Search (Vector + BM25)
+    ├─ Reranking (Cross-Encoder)
+    └─ Context Assembly
     ↓
 Layer 2: Storage ✅
     ├─ SQLite (метаданные + FTS5)

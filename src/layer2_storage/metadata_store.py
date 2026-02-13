@@ -165,6 +165,35 @@ class MetadataStore:
         rows = cursor.fetchall()
         
         return [dict(row) for row in rows]
+
+    def search_text(self, query_text: str, limit: int = 10) -> List[Dict]:
+        """
+        Full-text search using SQLite FTS5
+        Returns list of events matching keywords, sorted by rank
+        """
+        cursor = self.conn.cursor()
+        
+        # Safe FTS query using parameters
+        # We search in events_fts virtual table which is linked to events
+        sql = """
+            SELECT e.*, fts.rank 
+            FROM events e
+            JOIN events_fts fts ON e.rowid = fts.rowid
+            WHERE events_fts MATCH ?
+            ORDER BY fts.rank
+            LIMIT ?
+        """
+        
+        try:
+            # FTS5 expects query syntax, simple words work fine
+            # For more complex queries, might need sanitization
+            cursor.execute(sql, (query_text, limit))
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
+        except sqlite3.OperationalError as e:
+            logger.warning(f"FTS search failed for '{query_text}': {e}")
+            return []
+
     
     def count_events(self, source: Optional[str] = None) -> int:
         """Count total events (optionally by source)"""
