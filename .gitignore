@@ -27,6 +27,8 @@ data/raw/*.jsonl
 data/raw/*.pdf
 data/metadata.db
 data/metadata.db-*
+data/metadata.db-wal
+data/metadata.db-shm
 data/vector_index/
 
 # Logs
@@ -44,3 +46,10 @@ Thumbs.db
 # Secrets
 secrets.yaml
 config/local.yaml
+
+# Testing & Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+*.cover
+.hypothesis/
