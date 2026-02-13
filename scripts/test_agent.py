@@ -13,6 +13,8 @@ from src.layer3_retrieval.pipeline import RAGPipeline
 from src.layer4_generation.llm import OpenRouterClient
 from src.layer5_agents.tools import RetrievalTool, CalculatorTool
 from src.layer5_agents.agent import ReActAgent
+from src.layer5_agents.tools import RetrievalTool, CalculatorTool, SessionQueryTool
+
 
 logging.basicConfig(level=logging.INFO)
 # Silence verbose loggers
@@ -43,7 +45,8 @@ def test_agent():
     # L5 Tools
     tools = [
         RetrievalTool(rag_pipeline),
-        CalculatorTool()
+        CalculatorTool(),
+        SessionQueryTool()
     ]
     
     # Agent
