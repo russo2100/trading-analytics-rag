@@ -57,7 +57,7 @@ Layer 1 (Ingestion):  ✅ 100%
 Layer 2 (Storage):    ✅ 100%
 Layer 3 (Retrieval):  ✅ 100%
 Layer 4 (Generation): ✅ 100%
-Layer 5 (Agents):     ⏳ 0%
+Layer 5 (Agents):     ✅ 100%
 ```
 
 ---
@@ -95,7 +95,10 @@ python scripts/test_vector_search.py --interactive
 ```
 User Query
     ↓
-Layer 5: Agents (планируется)
+Layer 5: Agents ✅
+    ├─ ReAct Loop (Reason+Act)
+    ├─ Tools: Retrieval & Calculator
+    └─ Memory: Conversation History
     ↓
 Layer 4: Generation ✅
     ├─ LLM: OpenRouter (Claude/GPT)
