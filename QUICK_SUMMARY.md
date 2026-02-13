@@ -56,7 +56,7 @@ Action: Запустить build_vector_index.py
 Layer 1 (Ingestion):  ✅ 100%
 Layer 2 (Storage):    ✅ 100%
 Layer 3 (Retrieval):  ✅ 100%
-Layer 4 (Generation): ⏳ 0%
+Layer 4 (Generation): ✅ 100%
 Layer 5 (Agents):     ⏳ 0%
 ```
 
@@ -97,7 +97,10 @@ User Query
     ↓
 Layer 5: Agents (планируется)
     ↓
-Layer 4: Generation (планируется)
+Layer 4: Generation ✅
+    ├─ LLM: OpenRouter (Claude/GPT)
+    ├─ Prompts: Trading Expert Persona
+    └─ Generator: Context-Aware RAG
     ↓
 Layer 3: Retrieval ✅
     ├─ Hybrid Search (Vector + BM25)
